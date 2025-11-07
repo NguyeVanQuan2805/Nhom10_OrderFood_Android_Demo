@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activitis.PaymentActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thu tiền"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="32dp" />
+
+        <TextView
+            android:id="@+id/tv_total"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tổng tiền"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_title"
+            android:layout_marginTop="16dp" />
+
+        <TextView
+            android:id="@+id/tv_total_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="35.000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#4CAF50"
+            app:layout_constraintStart_toStartOf="@id/tv_total"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_total" />
+
+        <TextView
+            android:id="@+id/tv_tien_mat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tiền mặt"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_total"
+            android:layout_marginTop="24dp" />
+
+        <!-- Hàng 1: 35k, 40k, 50k -->
+        <LinearLayout
+            android:id="@+id/row_payment_1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_tien_mat"
+            android:layout_marginTop="16dp">
+
+            <Button
+                android:id="@+id/btn_35k"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="35.000"
+                android:layout_weight="1"
+                android:backgroundTint="#5E9DCA"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btn_40k"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="40.000"
+                android:layout_weight="1"
+                android:backgroundTint="#5E9DCA"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp" />
+
+            <Button
+                android:id="@+id/btn_50k"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="50.000"
+                android:layout_weight="1"
+                android:backgroundTint="#5E9DCA"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <!-- Hàng 2: 100k, 200k, 500k -->
+        <LinearLayout
+            android:id="@+id/row_payment_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/row_payment_1"
+            android:layout_marginTop="8dp">
+
+            <Button
+                android:id="@+id/btn_100k"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="100.000"
+                android:layout_weight="1"
+                android:backgroundTint="#5E9DCA"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp" />
+
+            <Button
+                android:id="@+id/btn_200k"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="200.000"
+                android:layout_weight="1"
+                android:backgroundTint="#5E9DCA"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp" />
+
+            <Button
+                android:id="@+id/btn_500k"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:text="500.000"
+                android:layout_weight="1"
+                android:backgroundTint="#5E9DCA"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_tra_lai"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trả lại"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/row_payment_2"
+            android:layout_marginTop="24dp" />
+
+        <TextView
+            android:id="@+id/tv_tra_lai_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#4CAF50"
+            app:layout_constraintStart_toStartOf="@id/tv_tra_lai"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_tra_lai" />
+
+        <Button
+            android:id="@+id/btn_hoan_thanh"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:text="HOÀN THÀNH"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="#4CAF50"
+            android:textColor="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_tra_lai"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">newOrderFood</string>
+    <string name="danh_sach_order">Danh sách Order</string>
+    <string name="todo">TODO</string>
+    <string name="todo1">TODO</string>
+    <string name="todo2">TODO</string>
+</resources>
