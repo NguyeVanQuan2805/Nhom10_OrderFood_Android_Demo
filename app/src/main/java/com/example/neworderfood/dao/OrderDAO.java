@@ -88,7 +88,21 @@ public class OrderDAO {
         }
     }
     // Thêm vào package com.example.neworderfood.dao; (giữ nguyên import)
-
+    public void updateOrderTotal(int orderId, int newTotal) {
+        openWritable();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.COL_ORDER_TOTAL, newTotal);
+            int updated = db.update(DatabaseHelper.TABLE_ORDERS, values,
+                    DatabaseHelper.COL_ORDER_ID + " = ?", new String[]{String.valueOf(orderId)});
+            Log.d("OrderDAO", "Updated total for order " + orderId + " to " + newTotal + " (rows: " + updated + ")");
+        } catch (Exception e) {
+            Log.e("OrderDAO", "Error updating total for order " + orderId, e);
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+    }
     public void deleteOrderById(int orderId) {
         openWritable();
         try {

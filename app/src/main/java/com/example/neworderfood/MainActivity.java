@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,15 +19,20 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.neworderfood.activitis.InvoiceListActivity;
 import com.example.neworderfood.activitis.LoginActivity;
 import com.example.neworderfood.activitis.MenuActivity;
 import com.example.neworderfood.activitis.PaymentActivity;
+import com.example.neworderfood.activitis.TableStatusActivity;
 import com.example.neworderfood.adapters.OrderAdapter;
 import com.example.neworderfood.R;
 import com.example.neworderfood.database.DatabaseHelper;
 import com.example.neworderfood.dao.OrderDAO;
 import com.example.neworderfood.models.Order;
+import com.example.neworderfood.models.OrderItem;
+import com.example.neworderfood.dao.OrderItemDAO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private OrderDAO orderDAO;
     private List<Order> orders = new ArrayList<>();
     private SharedPreferences prefs;
+    private  OrderItemDAO orderItemDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +85,37 @@ public class MainActivity extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new OrderAdapter(orders, order -> {
-            Intent intent = new Intent(this, PaymentActivity.class);
-            intent.putExtra("order_id", order.getId());
-            intent.putExtra("total_amount", order.getTotalAmount());
-            startActivity(intent);
+        orderItemDAO = dbHelper.getOrderItemDAO();  // Init DAO
+
+// Callback mới
+        adapter = new OrderAdapter(orders, new OrderAdapter.OnOrderActionListener() {
+            @Override
+            public void onPayClick(Order order) {
+                // Load data và mở Payment (như hướng dẫn sửa trước)
+                int tableNum = order.getTableNumber();
+                List<OrderItem> items = orderItemDAO.getOrderItemsByOrderId(order.getId());
+                if (tableNum > 0 && items != null && !items.isEmpty()) {
+                    Intent intent = new Intent(MainActivity.this, PaymentActivity.class);
+                    intent.putExtra("order_id", order.getId());
+                    intent.putExtra("total_amount", order.getTotalAmount());
+                    intent.putExtra("table_number", tableNum);
+                    intent.putExtra("items", (Serializable) items);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, "Lỗi load data order", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onAddDishClick(Order order) {
+                // Mở Menu để gọi thêm món (như hướng dẫn trước)
+                Intent intent = new Intent(MainActivity.this, MenuActivity.class);
+                intent.putExtra("isNewOrder", false);  // Gọi thêm
+                intent.putExtra("orderId", order.getId());
+                intent.putExtra("tableNumber", order.getTableNumber());
+                intent.putExtra("totalAmount", order.getTotalAmount());
+                startActivityForResult(intent, 3);  // Refresh sau khi thêm
+            }
         });
         recyclerView.setAdapter(adapter);
 
@@ -89,6 +123,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, MenuActivity.class);
             startActivity(intent);
         });
+
+//        Button btnViewTables = findViewById(R.id.btn_view_tables);  // Thêm vào layout
+//        btnViewTables.setOnClickListener(v -> {
+//            Intent intent = new Intent(this, TableStatusActivity.class);
+//            startActivity(intent);
+//        });
 
         loadOrders();
     }
@@ -101,10 +141,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_logout) {
+        int id = item.getItemId();  // Cache ID to avoid repeated calls
+        if (id == R.id.action_refresh) {
+            loadOrders();  // Reload list
+            Toast.makeText(this, "Đã làm mới", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_settings) {
+            // TODO: Open settings activity
+            Toast.makeText(this, "Cài đặt (coming soon)", Toast.LENGTH_SHORT).show();
+            return true;
+        } else if (id == R.id.action_logout) {
             prefs.edit().clear().apply();
             startActivity(new Intent(this, LoginActivity.class));
             finish();
+            return true;
+        }else if (id == R.id.action_invoices) {  // THÊM: Mở list hóa đơn
+            startActivity(new Intent(this, InvoiceListActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -118,7 +170,13 @@ public class MainActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
         }
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 3 && resultCode == RESULT_OK) {  // Từ thêm món
+            loadOrders();  // Refresh list
+        }
+    }
     private void loadOrders() {
         if (orderDAO == null) {
             Log.e(TAG, "orderDAO is null!");

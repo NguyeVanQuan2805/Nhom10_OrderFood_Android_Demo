@@ -1,6 +1,7 @@
 package com.example.neworderfood.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,10 +41,18 @@ public class AdminDishFragment extends Fragment {
         return view;
     }
 
+    // THÊM VÀO AdminCategoryFragment.java và AdminDishFragment.java
     private void loadData() {
-        dishes.clear();
-        dishes.addAll(dishDAO.getAllDishes());
-        if (adapter != null) adapter.notifyDataSetChanged();
+        try {
+            dishes.clear();
+            List<Dish> loadedDishes = dishDAO.getAllDishes();
+            if (loadedDishes != null) {
+                dishes.addAll(loadedDishes);
+            }
+            if (adapter != null) adapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            Log.e("AdminDishFragment", "Error loading dishes", e);
+        }
     }
 
     public void refresh() {

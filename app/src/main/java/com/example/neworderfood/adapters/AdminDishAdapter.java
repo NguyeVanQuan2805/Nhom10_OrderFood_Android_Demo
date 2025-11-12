@@ -1,5 +1,6 @@
 package com.example.neworderfood.adapters;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.neworderfood.R;
 import com.example.neworderfood.models.Dish;
+import com.example.neworderfood.utils.ImageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,16 +41,19 @@ public class AdminDishAdapter extends RecyclerView.Adapter<AdminDishAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Dish dish = dishes.get(position);
         holder.nameText.setText(dish.getName());
-        holder.priceText.setText(String.format("%,dđ", dish.getPrice()));  // Format
+        holder.priceText.setText(String.format("%,dđ", dish.getPrice()));
 
-        // Có thể thêm category name nếu fetch
+        // HIỂN THỊ ẢNH - ƯU TIÊN ẢNH CUSTOM
+        loadDishImage(holder.image, dish);
 
-        // Load image
-        if (dish.getImageResource() != 0) {
-            holder.image.setImageResource(dish.getImageResource());
-        } else {
-            holder.image.setImageResource(R.drawable.bun_ca);  // Default
+        // Hiển thị category name nếu có
+        if (holder.categoryText != null) {
+            // Có thể thêm logic để hiển thị tên category nếu cần
+            holder.categoryText.setText("Món ăn");
         }
+
+        // Hiển thị indicator ảnh custom
+        showCustomImageIndicator(holder, dish);
 
         holder.itemView.setOnLongClickListener(v -> {
             if (listener != null) {
@@ -58,20 +63,63 @@ public class AdminDishAdapter extends RecyclerView.Adapter<AdminDishAdapter.View
         });
     }
 
+    /**
+     * Phương thức load ảnh cho món ăn trong admin
+     */
+    private void loadDishImage(ImageView imageView, Dish dish) {
+        // Ưu tiên ảnh custom Base64
+        if (dish.hasCustomImage()) {
+            Bitmap customBitmap = ImageUtils.base64ToBitmap(dish.getImageBase64());
+            if (customBitmap != null) {
+                imageView.setImageBitmap(customBitmap);
+                return;
+            }
+        }
+
+        // Fallback đến ảnh resource
+        if (dish.getImageResource() != 0) {
+            try {
+                imageView.setImageResource(dish.getImageResource());
+                return;
+            } catch (Exception e) {
+                // Resource không tồn tại
+            }
+        }
+
+        // Ảnh mặc định
+        imageView.setImageResource(R.drawable.bun_ca);
+    }
+
+    /**
+     * Hiển thị indicator cho ảnh custom (tuỳ chọn)
+     */
+    private void showCustomImageIndicator(ViewHolder holder, Dish dish) {
+        if (dish.hasCustomImage()) {
+            // Có thể thêm badge hoặc indicator để biết đây là ảnh custom
+            // Ví dụ: đổi màu border hoặc thêm icon nhỏ
+            holder.image.setBackgroundResource(R.drawable.image_border_custom);
+        } else {
+            holder.image.setBackgroundResource(R.drawable.image_border);
+        }
+    }
+
     @Override
     public int getItemCount() {
         return dishes.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView nameText, priceText;
-        ImageView image;  // NEW: Add ImageView field
+        TextView nameText, priceText, categoryText;
+        ImageView image;
 
         ViewHolder(View view) {
             super(view);
             nameText = view.findViewById(R.id.dish_name);
             priceText = view.findViewById(R.id.dish_price);
-            image = view.findViewById(R.id.dish_image_admin);  // NEW: Initialize
+            image = view.findViewById(R.id.dish_image_admin);
+
+            // Category text có thể không có trong layout, kiểm tra trước
+            categoryText = view.findViewById(R.id.dish_category);
         }
     }
 

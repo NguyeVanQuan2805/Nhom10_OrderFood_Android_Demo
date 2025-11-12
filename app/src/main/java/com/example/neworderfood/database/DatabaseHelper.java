@@ -7,13 +7,17 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.example.neworderfood.R;
 import com.example.neworderfood.dao.CategoryDAO;
 import com.example.neworderfood.dao.DishDAO;
+import com.example.neworderfood.dao.InvoiceDAO;
 import com.example.neworderfood.dao.OrderDAO;
 import com.example.neworderfood.dao.OrderItemDAO;
+import com.example.neworderfood.dao.TableDAO;
 import com.example.neworderfood.dao.UserDAO; // New
 import com.example.neworderfood.models.Category;
 import com.example.neworderfood.models.Dish;
+import com.example.neworderfood.models.Invoice;
 import com.example.neworderfood.models.Order;
 import com.example.neworderfood.models.OrderItem;
 import com.example.neworderfood.models.User; // New
@@ -24,7 +28,7 @@ import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "CukCuk.db";
-    public static final int DATABASE_VERSION = 4;  // Increased for image column
+    public static final int DATABASE_VERSION = 8; // Increased for image column
 
     // Tables
     public static final String TABLE_DISHES = "dishes";
@@ -39,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_DISH_PRICE = "price";
     public static final String COL_DISH_CATEGORY = "category_id";
     public static final String COL_DISH_IMAGE = "image_resource";  // NEW
+    public static final String COL_DISH_IMAGE_BASE64 = "image_base64";
 
     // Order columns
     public static final String COL_ORDER_ID = "id";
@@ -65,12 +70,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_USER_PASSWORD = "password";
     public static final String COL_USER_ROLE = "role";
 
+    // columns table
+    public static final String TABLE_TABLES = "tables";  // NEW
+    public static final String COL_TABLE_ID = "id";
+    public static final String COL_TABLE_NUMBER = "number";
+    public static final String COL_TABLE_STATUS = "status";
+
     public final Context mContext;
     public DishDAO dishDAO;
     public OrderDAO orderDAO;
     public OrderItemDAO orderItemDAO;
     public CategoryDAO categoryDAO;
     public UserDAO userDAO; // New
+    public TableDAO tableDAO;
+    private InvoiceDAO invoiceDAO;
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -80,7 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Tạo bảng Users first (before categories and dishes)
-        String createUsers = "CREATE TABLE " + TABLE_USERS + " (" +
+        String createUsers = "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + " (" +  // THÊM IF NOT EXISTS
                 COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_USER_USERNAME + " TEXT UNIQUE, " +
                 COL_USER_PASSWORD + " TEXT, " +
@@ -88,23 +101,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createUsers);
 
         // Tạo bảng Categories
-        String createCategories = "CREATE TABLE " + TABLE_CATEGORIES + " (" +
+        String createCategories = "CREATE TABLE IF NOT EXISTS " + TABLE_CATEGORIES + " (" +  // THÊM IF NOT EXISTS
                 COL_CAT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_CAT_NAME + " TEXT UNIQUE)";
         db.execSQL(createCategories);
 
         // Tạo bảng Dishes (với image column)
-        String createDishes = "CREATE TABLE " + TABLE_DISHES + " (" +
+        String createDishes = "CREATE TABLE IF NOT EXISTS " + TABLE_DISHES + " (" +  // THÊM IF NOT EXISTS
                 COL_DISH_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_DISH_NAME + " TEXT, " +
                 COL_DISH_PRICE + " INTEGER, " +
                 COL_DISH_CATEGORY + " INTEGER, " +
                 COL_DISH_IMAGE + " INTEGER, " +
+                COL_DISH_IMAGE_BASE64 + " TEXT, " +
                 "FOREIGN KEY(" + COL_DISH_CATEGORY + ") REFERENCES " + TABLE_CATEGORIES + "(" + COL_CAT_ID + "))";
         db.execSQL(createDishes);
 
         // Tạo bảng Orders
-        String createOrders = "CREATE TABLE " + TABLE_ORDERS + " (" +
+        String createOrders = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDERS + " (" +  // THÊM IF NOT EXISTS
                 COL_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_ORDER_TABLE + " INTEGER, " +
                 COL_ORDER_TOTAL + " INTEGER, " +
@@ -113,7 +127,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(createOrders);
 
         // Tạo bảng OrderItems
-        String createItems = "CREATE TABLE " + TABLE_ORDER_ITEMS + " (" +
+        String createItems = "CREATE TABLE IF NOT EXISTS " + TABLE_ORDER_ITEMS + " (" +  // THÊM IF NOT EXISTS
                 COL_ITEM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_ITEM_ORDER_ID + " INTEGER, " +
                 COL_ITEM_DISH_ID + " INTEGER, " +
@@ -124,10 +138,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "FOREIGN KEY(" + COL_ITEM_DISH_ID + ") REFERENCES " + TABLE_DISHES + "(" + COL_DISH_ID + "))";
         db.execSQL(createItems);
 
-        // Insert sample data
+        // Tạo bảng Tables
+        String createTablesTable = "CREATE TABLE IF NOT EXISTS tables (" +  // THÊM IF NOT EXISTS
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "number INTEGER NOT NULL UNIQUE, " +
+                "status TEXT DEFAULT 'Còn trống')";
+        db.execSQL(createTablesTable);
+
+        // THÊM: Tạo bảng Invoices (mới)
+        String createInvoices = "CREATE TABLE IF NOT EXISTS invoices (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "date TEXT, " +
+                "table_number INTEGER, " +
+                "total_amount INTEGER, " +
+                "change_amount INTEGER)";
+        db.execSQL(createInvoices);
+
+        // THÊM: Tạo bảng InvoiceItems
+        String createInvoiceItems = "CREATE TABLE IF NOT EXISTS invoice_items (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "invoice_id INTEGER, " +
+                "dish_id INTEGER, " +
+                "quantity INTEGER, " +
+                "notes TEXT, " +
+                "FOREIGN KEY(invoice_id) REFERENCES invoices(id) ON DELETE CASCADE)";
+        db.execSQL(createInvoiceItems);
+
+        // Insert sample data (chỉ nếu bảng rỗng)
         insertSampleUsers(db);
         insertSampleCategories(db);
         insertSampleDishes(db);
+        insertSampleTables(db);
     }
 
     private void insertSampleUsers(SQLiteDatabase db) {
@@ -154,54 +195,114 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // SỬA TRONG DatabaseHelper.java - phần insertSampleDishes
+    // TRONG DatabaseHelper.java - sửa insertSampleDishes
     private void insertSampleDishes(SQLiteDatabase db) {
         String[][] dishData = {
-                {"Bún cá", "30000", "Bún cá", "bun_ca"},
-                {"Bánh đa cua", "30000", "Bún cá", "banh_da_cua"},
-                {"Bún riêu cua", "30000", "Bún cá", "bun_rieu_cua"},
-                {"Bún cá giò", "35000", "Bún cá", "bun_ca_gio"},
-                {"Bún cá mọc", "35000", "Bún cá", "bun_ca_moc"},
-                {"Bún cá bò", "35000", "Bún cá", "bun_ca_bo"},
-                {"Quẩy", "5000", "Khác", "quay"},
-                {"Rau thơm", "10000", "Khác", "rau_thom"},
-                {"Coca", "10000", "Đồ uống", "coca"},
-                {"Nước cam", "15000", "Đồ uống", "nuoc_cam"}
+                {"Bún cá", "30000", "1", "bun_ca"},
+                {"Bánh đa cua", "30000", "1", "banh_da_cua"},
+                {"Bún riêu cua", "30000", "1", "bun_rieu_cua"},
+                {"Bún cá giò", "35000", "1", "bun_ca_gio"},
+                {"Bún cá mọc", "35000", "1", "bun_ca_moc"},
+                {"Bún cá bò", "35000", "1", "bun_ca_bo"},
+                {"Quẩy", "5000", "3", "quay"},
+                {"Rau thơm", "10000", "3", "rau_thom"},
+                {"Coca", "10000", "2", "coca"},
+                {"Nước cam", "15000", "2", "nuoc_cam"}
         };
 
         for (String[] data : dishData) {
-            Cursor cursor = db.query(TABLE_CATEGORIES, new String[]{COL_CAT_ID},
-                    COL_CAT_NAME + " = ?", new String[]{data[2]}, null, null, null);
-            if (cursor.moveToFirst()) {
-                int catId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_ID));
+            ContentValues values = new ContentValues();
+            values.put(COL_DISH_NAME, data[0]);
+            values.put(COL_DISH_PRICE, Integer.parseInt(data[1]));
+            values.put(COL_DISH_CATEGORY, Integer.parseInt(data[2]));
+
+            // THÊM LOG ĐỂ DEBUG
+            int imageResId = mContext.getResources().getIdentifier(data[3], "drawable", mContext.getPackageName());
+            Log.d("DatabaseHelper", "Dish: " + data[0] + ", Resource: " + data[3] + ", ID: " + imageResId);
+
+            if (imageResId > 0) {
+                values.put(COL_DISH_IMAGE, imageResId);
+            } else {
+                // Nếu không tìm thấy, sử dụng resource khác nhau cho từng category
+                int fallbackImage = getFallbackImage(Integer.parseInt(data[2]));
+                values.put(COL_DISH_IMAGE, fallbackImage);
+                Log.w("DatabaseHelper", "Fallback image for: " + data[0] + " -> " + fallbackImage);
+            }
+
+            db.insert(TABLE_DISHES, null, values);
+        }
+    }
+
+    private void insertSampleTables(SQLiteDatabase db) {
+        int[] sampleNumbers = {1, 2, 3, 4, 5};
+        for (int num : sampleNumbers) {
+            Cursor cursor = db.query("tables", new String[]{"id"}, "number = ?", new String[]{String.valueOf(num)}, null, null, null);
+            if (cursor.getCount() == 0) {  // Chưa tồn tại
                 ContentValues values = new ContentValues();
-                values.put(COL_DISH_NAME, data[0]);
-                values.put(COL_DISH_PRICE, Integer.parseInt(data[1]));
-                values.put(COL_DISH_CATEGORY, catId);
-                // SỬA: Sử dụng mContext để lấy resource ID (nếu file drawable tồn tại, nếu không = 0)
-                int imageResId = mContext.getResources().getIdentifier(data[3], "drawable", mContext.getPackageName());
-                values.put(COL_DISH_IMAGE, imageResId > 0 ? imageResId : 0);  // 0 nếu không tìm thấy
-                db.insert(TABLE_DISHES, null, values);
+                values.put(COL_TABLE_NUMBER, num);
+                values.put(COL_TABLE_STATUS, "Còn trống");
+                db.insert(TABLE_TABLES, null, values);
             }
             cursor.close();
         }
     }
 
+    // Thêm phương thức fallback image theo category
+    private int getFallbackImage(int categoryId) {
+        switch (categoryId) {
+            case 1: // Bún cá
+                return R.drawable.bun_ca;
+            case 2: // Đồ uống
+                return R.drawable.nuoc_cam; // hoặc R.drawable.nuoc_cam
+            case 3: // Khác
+                return R.drawable.quay;
+            default:
+                return R.drawable.bun_ca;
+        }
+    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        if (oldVersion < 8) {  // THÊM: Tạo bảng invoices nếu version < 8
+            String createInvoices = "CREATE TABLE invoices (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "date TEXT, " +
+                    "table_number INTEGER, " +
+                    "total_amount INTEGER, " +
+                    "change_amount INTEGER)";
+            db.execSQL(createInvoices);
+
+            String createInvoiceItems = "CREATE TABLE invoice_items (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "invoice_id INTEGER, " +
+                    "dish_id INTEGER, " +
+                    "quantity INTEGER, " +
+                    "notes TEXT, " +
+                    "FOREIGN KEY(invoice_id) REFERENCES invoices(id) ON DELETE CASCADE)";
+            db.execSQL(createInvoiceItems);
+        }
+        if (oldVersion < 6) {
+            // Thêm cột image_base64
+            db.execSQL("ALTER TABLE " + TABLE_DISHES + " ADD COLUMN " + COL_DISH_IMAGE_BASE64 + " TEXT");
+        }
         if (oldVersion < 4) {
             // Add image column
             db.execSQL("ALTER TABLE " + TABLE_DISHES + " ADD COLUMN " + COL_DISH_IMAGE + " INTEGER DEFAULT 0");
         }
         if (oldVersion < 3) {
             // Add users table
-            db.execSQL("CREATE TABLE " + TABLE_USERS + " (" +
+            String createUsers = "CREATE TABLE IF NOT EXISTS " + TABLE_USERS + " (" +  // SỬA: IF NOT EXISTS +
                     COL_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COL_USER_USERNAME + " TEXT UNIQUE, " +
                     COL_USER_PASSWORD + " TEXT, " +
-                    COL_USER_ROLE + " TEXT)");
+                    COL_USER_ROLE + " TEXT)";
+            db.execSQL(createUsers);
             insertSampleUsers(db);
         }
         if (oldVersion < 2) {
+            db.execSQL("DROP TABLE IF EXISTS tables");  // Drop nếu cần
+            // Gọi lại onCreate để tạo mới
+            onCreate(db);
             // Previous migrations for categories
             db.execSQL("CREATE TABLE " + TABLE_CATEGORIES + " (" +
                     COL_CAT_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -216,6 +317,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORIES);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         onCreate(db);
+    }
+    // Thêm vào DishDAO hoặc DatabaseHelper
+    public void debugDishImages() {
+        List<Dish> dishes = getAllDishes();
+        for (Dish dish : dishes) {
+            String resourceName = "";
+            try {
+                resourceName = mContext.getResources().getResourceName(dish.getImageResource());
+            } catch (Exception e) {
+                resourceName = "Unknown (" + dish.getImageResource() + ")";
+            }
+            Log.d("DishDebug", "Dish: " + dish.getName() + " -> Image: " + resourceName);
+        }
     }
 
     // Lazy initialization cho DAO
@@ -243,6 +357,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (userDAO == null) userDAO = new UserDAO(mContext);
         return userDAO;
     }
+    public TableDAO getTableDAO() {
+        if (tableDAO == null) tableDAO = new TableDAO(mContext);
+        return tableDAO;
+    }
+    public void addTable(com.example.neworderfood.models.Table table) { getTableDAO().addTable(table); }
+    public int updateTable(com.example.neworderfood.models.Table table) {
+        return getTableDAO().updateTable(table);  // SỬA: Return int từ DAO
+    }
+    public int deleteTable(int id) { return getTableDAO().deleteTable(id); }
+    public List<com.example.neworderfood.models.Table> getAllTables() { return getTableDAO().getAllTables(); }
+    public void updateTableStatus(int tableId, String status) { getTableDAO().updateTableStatus(tableId, status); }
 
     // Delegate methods (unchanged + new for User)
     public long addOrder(Order order) { return getOrderDAO().addOrder(order); }
@@ -257,9 +382,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void deleteOrderItemsByOrderId(int orderId) { getOrderItemDAO().deleteOrderItemsByOrderId(orderId); }
     public List<Category> getAllCategories() { return getCategoryDAO().getAllCategories(); }
     public Category getCategoryById(int id) { return getCategoryDAO().getCategoryById(id); }
-
+    public List<User> getAllUsers() {
+        return getUserDAO().getAllUsers();  // THÊM method này vào UserDAO
+    }
+    // Thêm vào DatabaseHelper
+    public int updateUser(User user) { return getUserDAO().updateUser(user); }
+    public int deleteUser(int id) { return getUserDAO().deleteUser(id); }
     // New delegates for User
     public User getUserByUsernameAndPassword(String username, String password) {
         return getUserDAO().getUserByUsernameAndPassword(username, password);
     }
+
+    public InvoiceDAO getInvoiceDAO() {
+        if (invoiceDAO == null) invoiceDAO = new InvoiceDAO(mContext);
+        return invoiceDAO;
+    }
+    public long addInvoice(Invoice invoice) { return getInvoiceDAO().addInvoice(invoice); }
+    public List<Invoice> getAllInvoices() { return getInvoiceDAO().getAllInvoices(); }
+    public List<OrderItem> getInvoiceItemsByInvoiceId(int invoiceId) { return getInvoiceDAO().getInvoiceItemsByInvoiceId(invoiceId); }
 }

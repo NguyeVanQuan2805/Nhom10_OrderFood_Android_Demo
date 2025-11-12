@@ -1,8 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_logout"
-        android:title="Đăng xuất"
-        app:showAsAction="never" />
+
+    <!-- Group for main actions -->
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/action_refresh"
+            android:title="Làm mới"
+            android:icon="@drawable/ic_refresh"
+            app:showAsAction="ifRoom"
+            android:contentDescription="Làm mới danh sách order" />
+    </group>
+
+    <!-- Group for settings and logout -->
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/action_settings"
+            android:title="Cài đặt"
+            android:icon="@drawable/ic_settings"
+            app:showAsAction="never"
+            android:contentDescription="Cài đặt ứng dụng" />
+        <item
+            android:id="@+id/action_logout"
+            android:title="Đăng xuất"
+            android:icon="@drawable/ic_logout"
+            app:showAsAction="never"
+            android:contentDescription="Đăng xuất tài khoản" />
+        <item
+            android:id="@+id/action_invoices"
+            android:title="Xem Hóa đơn"
+            app:showAsAction="never" />
+    </group>
+
 </menu>

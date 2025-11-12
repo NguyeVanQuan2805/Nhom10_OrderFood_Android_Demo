@@ -18,39 +18,44 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@android:color/white">
 
-        <EditText
-            android:id="@+id/et_search"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Tìm kiếm..."
-            android:background="@drawable/search_icon" />
-
+        <!-- SỬA: Đưa EditText ra ngoài Toolbar -->
     </androidx.appcompat.widget.Toolbar>
+
+    <!-- THÊM: EditText search bên ngoài Toolbar -->
+    <EditText
+        android:id="@+id/et_search"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Tìm kiếm..."
+        android:background="@drawable/search_background"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        android:layout_margin="8dp" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_categories"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:tabMode="fixed"
+        app:tabMode="scrollable"
         app:tabTextColor="#757575"
         app:tabSelectedTextColor="#2196F3"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        app:layout_constraintTop_toBottomOf="@id/et_search"
         android:layout_marginTop="8dp" />
 
+    <!-- QUAN TRỌNG: Đảm bảo RecyclerView có ID rv_dishes -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_dishes"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="12dp"
         app:layout_constraintBottom_toTopOf="@id/tv_total"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tab_categories"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@id/tab_categories" />
 
     <TextView
         android:id="@+id/tv_total"
@@ -63,34 +68,23 @@
         app:layout_constraintBottom_toTopOf="@id/layout_bottom"
         android:layout_marginBottom="8dp" />
 
-    <!-- Biểu tượng bàn và hộp quà (floating hoặc linear) -->
-    <LinearLayout
-        android:id="@+id/layout_icons"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/rv_dishes"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp">
-
-
-    </LinearLayout>
-
+    <!-- Các phần còn lại giữ nguyên -->
     <ImageButton
         android:id="@+id/btn_table"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/ic_table_green"
-        app:layout_constraintBottom_toTopOf="@+id/layout_bottom"
-        app:layout_constraintStart_toEndOf="@+id/btn_discount" />
+        android:background="@drawable/search_background"
+        app:layout_constraintBottom_toTopOf="@id/layout_bottom"
+        app:layout_constraintStart_toEndOf="@id/btn_discount" />
 
     <ImageButton
         android:id="@+id/btn_discount"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:src="@drawable/ic_gift"
-        app:layout_constraintBottom_toTopOf="@+id/layout_bottom"
+        android:background="@drawable/search_background"
+        app:layout_constraintBottom_toTopOf="@id/layout_bottom"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
@@ -109,8 +103,9 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_invoice"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp" />
+            android:background="@drawable/search_background"
+            android:layout_marginEnd="16dp" />
+
         <Button
             android:id="@+id/btn_luu"
             android:layout_width="0dp"

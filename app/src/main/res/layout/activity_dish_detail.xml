@@ -1,131 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
     tools:context=".activitis.DishDetailActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+    <!-- THÊM: Toolbar với nút quay về (mũi tên back) -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#2196F3"
+        android:title="Chi tiết món"
+        app:titleTextColor="@android:color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/iv_dish"
-            android:layout_width="0dp"
-            android:layout_height="200dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/bun_ca"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <!-- ScrollView cũ, nhưng constraint top_toBottomOf toolbar -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fitsSystemWindows="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-        <TextView
-            android:id="@+id/tv_dish_name"
-            android:layout_width="0dp"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tên món"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/iv_dish"
-            android:layout_marginTop="16dp" />
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Giá: 0đ"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#4CAF50"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_dish_name"
-            android:layout_marginTop="8dp" />
+            <ImageView
+                android:id="@+id/iv_dish"
+                android:layout_width="0dp"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/bun_ca"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/tv_quantity_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Số lượng"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_price"
-            android:layout_marginTop="24dp" />
+            <TextView
+                android:id="@+id/tv_dish_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Tên món"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_dish"
+                android:layout_marginTop="16dp" />
 
-        <EditText
-            android:id="@+id/et_quantity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="number"
-            android:text="1"
-            app:layout_constraintTop_toTopOf="@id/tv_quantity_label"
-            app:layout_constraintStart_toEndOf="@id/tv_quantity_label"
-            android:layout_marginStart="8dp" />
+            <TextView
+                android:id="@+id/tv_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Giá: 0đ"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#4CAF50"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_dish_name"
+                android:layout_marginTop="8dp" />
 
-        <TextView
-            android:id="@+id/tv_notes_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ghi chú"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_quantity"
-            android:layout_marginTop="24dp" />
+            <TextView
+                android:id="@+id/tv_quantity_label"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:text="Số lượng"
+                android:textStyle="bold"
+                android:paddingTop="10dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_price"
+                android:layout_marginTop="20dp" />
 
-        <EditText
-            android:id="@+id/et_notes"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="Nhập ghi chú..."
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_notes_label"
-            android:layout_marginTop="8dp" />
+            <EditText
+                android:id="@+id/et_quantity"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:inputType="number"
+                android:text="1"
+                app:layout_constraintStart_toEndOf="@id/tv_quantity_label"
+                app:layout_constraintTop_toTopOf="@id/tv_quantity_label" />
 
-        <!-- Checkboxes for rau -->
-        <CheckBox
-            android:id="@+id/cb_ra_tran"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rau tần"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_notes"
-            android:layout_marginTop="16dp" />
+            <TextView
+                android:id="@+id/tv_notes_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ghi chú"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_quantity"
+                android:layout_marginTop="24dp" />
 
-        <CheckBox
-            android:id="@+id/cb_ra_cai"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rau cải"
-            app:layout_constraintTop_toTopOf="@id/cb_ra_tran"
-            app:layout_constraintStart_toEndOf="@id/cb_ra_tran"
-            android:layout_marginStart="32dp" />
+            <EditText
+                android:id="@+id/et_notes"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="Nhập ghi chú..."
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_notes_label"
+                android:layout_marginTop="8dp" />
 
-        <CheckBox
-            android:id="@+id/cb_ra_ngot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rau ngót"
-            app:layout_constraintTop_toTopOf="@id/cb_ra_tran"
-            app:layout_constraintStart_toEndOf="@id/cb_ra_cai"
-            android:layout_marginStart="16dp" />
+            <!-- Label cho rau (sẽ ẩn/hiện theo code) -->
+            <TextView
+                android:id="@+id/tv_rau_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Chọn rau (tùy chọn):"
+                android:textStyle="bold"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_notes"
+                android:layout_marginTop="16dp" />
 
-        <Button
-            android:id="@+id/btn_add"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Thêm vào order"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cb_ra_tran"
-            android:layout_marginTop="24dp" />
+            <!-- Checkboxes (default gone, code sẽ show nếu danh mục Bún) -->
+            <CheckBox
+                android:id="@+id/cb_ra_tran"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rau tần"
+                android:visibility="gone"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_rau_label"
+                android:layout_marginTop="8dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <CheckBox
+                android:id="@+id/cb_ra_cai"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rau cải"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@id/cb_ra_tran"
+                app:layout_constraintStart_toEndOf="@id/cb_ra_tran"
+                android:layout_marginStart="32dp" />
 
-</ScrollView>
+            <CheckBox
+                android:id="@+id/cb_ra_ngot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Rau ngót"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@id/cb_ra_tran"
+                app:layout_constraintStart_toEndOf="@id/cb_ra_cai"
+                android:layout_marginStart="16dp" />
+
+            <Button
+                android:id="@+id/btn_add"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Thêm vào order"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/cb_ra_tran"
+                android:layout_marginTop="24dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

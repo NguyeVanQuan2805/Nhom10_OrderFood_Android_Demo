@@ -1,5 +1,6 @@
 package com.example.neworderfood.adapters;
 
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,13 +14,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.neworderfood.R;
 import com.example.neworderfood.models.Dish;
+import com.example.neworderfood.utils.ImageUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> implements Filterable {
-    private List<Dish> dishes;  // List hiển thị hiện tại
-    private List<Dish> originalDishes;  // List gốc để filter
+    private List<Dish> dishes;
+    private List<Dish> originalDishes;
     private OnDishClickListener listener;
 
     public interface OnDishClickListener {
@@ -43,14 +45,40 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> im
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Dish dish = dishes.get(position);
         holder.nameText.setText(dish.getName());
-        holder.priceText.setText(String.format("%,dđ", dish.getPrice()));  // Format số tiền
-        // Load image if needed (placeholder)
-        if (dish.getImageResource() != 0) {
-            holder.image.setImageResource(dish.getImageResource());
-        } else {
-            holder.image.setImageResource(R.drawable.bun_ca);  // Default
-        }
+        holder.priceText.setText(String.format("%,dđ", dish.getPrice()));
+
+        // HIỂN THỊ ẢNH - ƯU TIÊN ẢNH CUSTOM
+        loadDishImage(holder.image, dish);
+
         holder.itemView.setOnClickListener(v -> listener.onDishClick(dish));
+    }
+
+    /**
+     * Phương thức load ảnh cho món ăn
+     * Ưu tiên: Ảnh custom Base64 -> Ảnh resource -> Ảnh mặc định
+     */
+    private void loadDishImage(ImageView imageView, Dish dish) {
+        // Kiểm tra và hiển thị ảnh custom (Base64)
+        if (dish.hasCustomImage()) {
+            Bitmap customBitmap = ImageUtils.base64ToBitmap(dish.getImageBase64());
+            if (customBitmap != null) {
+                imageView.setImageBitmap(customBitmap);
+                return; // Thoát nếu đã load được ảnh custom
+            }
+        }
+
+        // Kiểm tra và hiển thị ảnh resource
+        if (dish.getImageResource() != 0) {
+            try {
+                imageView.setImageResource(dish.getImageResource());
+                return; // Thoát nếu đã load được ảnh resource
+            } catch (Exception e) {
+                // Fallback nếu resource không tồn tại
+            }
+        }
+
+        // Sử dụng ảnh mặc định
+        imageView.setImageResource(R.drawable.bun_ca);
     }
 
     @Override
@@ -70,7 +98,7 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> im
         }
     }
 
-    // Filter cho search (tìm theo name hoặc category, nhưng vì categoryId, có thể extend nếu cần name)
+    // Filter cho search
     @Override
     public Filter getFilter() {
         return new Filter() {
@@ -83,7 +111,7 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> im
                     List<Dish> filtered = new ArrayList<>();
                     String query = constraint.toString().toLowerCase().trim();
                     for (Dish dish : originalDishes) {
-                        if (dish.getName().toLowerCase().contains(query)) {  // Có thể thêm category name nếu fetch
+                        if (dish.getName().toLowerCase().contains(query)) {
                             filtered.add(dish);
                         }
                     }
@@ -102,7 +130,7 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> im
         };
     }
 
-    // Update list mới (cho load category khác)
+    // Update list mới
     public void updateDishes(List<Dish> newDishes) {
         this.dishes = newDishes != null ? newDishes : new ArrayList<>();
         this.originalDishes = new ArrayList<>(this.dishes);

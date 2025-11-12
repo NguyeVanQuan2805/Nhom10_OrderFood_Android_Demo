@@ -1,6 +1,5 @@
-// New Category.java model
 package com.example.neworderfood.models;
-
+// New Category.java model
 import java.io.Serializable;
 
 public class Category implements Serializable {
@@ -19,4 +18,9 @@ public class Category implements Serializable {
     // Setters
     public void setId(int id) { this.id = id; }
     public void setName(String name) { this.name = name; }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

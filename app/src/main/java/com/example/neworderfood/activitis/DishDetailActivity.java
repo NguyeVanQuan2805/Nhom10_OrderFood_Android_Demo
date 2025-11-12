@@ -3,6 +3,7 @@ package com.example.neworderfood.activitis;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -30,8 +32,18 @@ public class DishDetailActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-
+        Toolbar toolbar = findViewById(R.id.toolbar);  // THÊM ID toolbar vào XML (xem bước 3)
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setTitle("Chi tiết món");
+                getSupportActionBar().setDisplayHomeAsUpEnabled(true);  // THÊM: Nút quay về (mũi tên back)
+                getSupportActionBar().setDisplayShowHomeEnabled(true);
+            }
+        }
         Dish dish = (Dish) getIntent().getSerializableExtra("dish");
+        int categoryId = getIntent().getIntExtra("categoryId", 0);  // THÊM: Lấy categoryId, default 0 nếu không có
+
         TextView tvName = findViewById(R.id.tv_dish_name);
         tvName.setText(dish.getName());
         TextView tvPrice = findViewById(R.id.tv_price);
@@ -41,21 +53,38 @@ public class DishDetailActivity extends AppCompatActivity {
         EditText etNotes = findViewById(R.id.et_notes);
         Button btnAdd = findViewById(R.id.btn_add);
 
-        // Checkboxes for rau
+        // THÊM: Group CheckBox cho rau
         CheckBox cbRaTran = findViewById(R.id.cb_ra_tran);
-        cbRaTran.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            updateNotes(etNotes, isChecked, "Rau tần");
-        });
-
         CheckBox cbRaCai = findViewById(R.id.cb_ra_cai);
-        cbRaCai.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            updateNotes(etNotes, isChecked, "Rau cải");
-        });
-
         CheckBox cbRaNgot = findViewById(R.id.cb_ra_ngot);
-        cbRaNgot.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            updateNotes(etNotes, isChecked, "Rau ngót");
-        });
+        TextView tvRauLabel = findViewById(R.id.tv_rau_label);
+
+        // THÊM: Ẩn/hiện phần chọn rau dựa trên categoryId (1 = Bún cá)
+        boolean showRau = (categoryId == 1);  // Chỉ hiện cho danh mục Bún
+        if (showRau) {
+            // Hiện CheckBox và label
+            cbRaTran.setVisibility(View.VISIBLE);
+            cbRaCai.setVisibility(View.VISIBLE);
+            cbRaNgot.setVisibility(View.VISIBLE);
+            if (tvRauLabel != null) tvRauLabel.setVisibility(View.VISIBLE);
+
+            // Set listener cho CheckBox (giữ nguyên code cũ)
+            cbRaTran.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                updateNotes(etNotes, isChecked, "Rau tần");
+            });
+            cbRaCai.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                updateNotes(etNotes, isChecked, "Rau cải");
+            });
+            cbRaNgot.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                updateNotes(etNotes, isChecked, "Rau ngót");
+            });
+        } else {
+            // Ẩn CheckBox và label
+            cbRaTran.setVisibility(View.GONE);
+            cbRaCai.setVisibility(View.GONE);
+            cbRaNgot.setVisibility(View.GONE);
+            if (tvRauLabel != null) tvRauLabel.setVisibility(View.GONE);
+        }
 
         btnAdd.setOnClickListener(v -> {
             String quantityStr = etQuantity.getText().toString();
@@ -79,5 +108,10 @@ public class DishDetailActivity extends AppCompatActivity {
             // Remove if unchecked (simple, no exact match check for demo)
             etNotes.setText(currentNotes.replace(", " + rauType, "").replace(rauType, ""));
         }
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();  // Quay về MenuActivity
+        return true;
     }
 }

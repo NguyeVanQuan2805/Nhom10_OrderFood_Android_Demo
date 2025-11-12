@@ -1,4 +1,3 @@
-
 package com.example.neworderfood.dao;
 
 import android.content.ContentValues;
@@ -94,7 +93,8 @@ public class DishDAO {
                         cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_DISH_NAME)),
                         cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_DISH_PRICE)),
                         cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_DISH_CATEGORY)),
-                        cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_DISH_IMAGE))
+                        cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_DISH_IMAGE)),
+                        cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_DISH_IMAGE_BASE64))
                 );
             }
         } catch (Exception e) {
@@ -105,7 +105,9 @@ public class DishDAO {
         return null;
     }
 
+
     // New methods
+    // SỬA TRONG DishDAO.java
     public long addDish(Dish dish) {
         openWritable();
         try {
@@ -113,7 +115,8 @@ public class DishDAO {
             values.put(DatabaseHelper.COL_DISH_NAME, dish.getName());
             values.put(DatabaseHelper.COL_DISH_PRICE, dish.getPrice());
             values.put(DatabaseHelper.COL_DISH_CATEGORY, dish.getCategoryId());
-            values.put(DatabaseHelper.COL_DISH_CATEGORY, dish.getImageResource());
+            values.put(DatabaseHelper.COL_DISH_IMAGE, dish.getImageResource());
+            values.put(DatabaseHelper.COL_DISH_IMAGE_BASE64, dish.getImageBase64()); // THÊM
             return db.insert(DatabaseHelper.TABLE_DISHES, null, values);
         } catch (Exception e) {
             e.printStackTrace();
@@ -130,7 +133,8 @@ public class DishDAO {
             values.put(DatabaseHelper.COL_DISH_NAME, dish.getName());
             values.put(DatabaseHelper.COL_DISH_PRICE, dish.getPrice());
             values.put(DatabaseHelper.COL_DISH_CATEGORY, dish.getCategoryId());
-            values.put(DatabaseHelper.COL_DISH_CATEGORY, dish.getImageResource());
+            values.put(DatabaseHelper.COL_DISH_IMAGE, dish.getImageResource());
+            values.put(DatabaseHelper.COL_DISH_IMAGE_BASE64, dish.getImageBase64()); // THÊM
             return db.update(DatabaseHelper.TABLE_DISHES, values,
                     DatabaseHelper.COL_DISH_ID + " = ?", new String[]{String.valueOf(dish.getId())});
         } catch (Exception e) {
@@ -140,7 +144,6 @@ public class DishDAO {
             close();
         }
     }
-
     public int deleteDish(int id) {
         openWritable();
         try {
@@ -152,5 +155,23 @@ public class DishDAO {
         } finally {
             close();
         }
+    }
+    public int getDishCountByCategory(int categoryId) {
+        openReadable();
+        try (Cursor cursor = db.query(
+                DatabaseHelper.TABLE_DISHES,
+                new String[]{"COUNT(*) AS count"},  // Chỉ đếm
+                DatabaseHelper.COL_DISH_CATEGORY + " = ?",
+                new String[]{String.valueOf(categoryId)},
+                null, null, null)) {
+            if (cursor.moveToFirst()) {
+                return cursor.getInt(cursor.getColumnIndexOrThrow("count"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+        return 0;  // Default 0 nếu lỗi
     }
 }

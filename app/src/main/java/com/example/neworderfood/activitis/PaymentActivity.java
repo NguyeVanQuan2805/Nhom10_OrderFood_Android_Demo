@@ -18,8 +18,16 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.neworderfood.R;
 import com.example.neworderfood.database.DatabaseHelper;
 import com.example.neworderfood.dao.OrderDAO;
+import com.example.neworderfood.models.Invoice;
+import com.example.neworderfood.models.OrderItem;
+import com.google.android.material.snackbar.Snackbar;
+
+import java.util.Date;
+import java.util.List;
 
 public class PaymentActivity extends AppCompatActivity {
+    private static final String TAG = "PaymentActivity";
+
     private DatabaseHelper dbHelper;
     private OrderDAO orderDAO;
     private int totalAmount = 0;
@@ -27,6 +35,9 @@ public class PaymentActivity extends AppCompatActivity {
     private TextView tvTraLaiAmount;
     private TextView tvTotalAmount;
     private Button selectedButton = null;
+    private List<OrderItem> orderItems;  // THÊM: Field cho items
+    private int tableNumber;  // THÊM: Field cho tableNumber
+    private int orderId;  // THÊM: Field cho orderId
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,8 +56,31 @@ public class PaymentActivity extends AppCompatActivity {
 
         setupToolbar();
 
-        int orderId = getIntent().getIntExtra("order_id", 0);
+        orderId = getIntent().getIntExtra("order_id", 0);  // SỬA: Lấy orderId
+        if (orderId <= 0) {  // SỬA: Kiểm tra orderId hợp lệ
+            Log.e(TAG, "Invalid orderId: " + orderId);
+            Snackbar.make(findViewById(android.R.id.content), "Lỗi: Order không hợp lệ", Snackbar.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         totalAmount = getIntent().getIntExtra("total_amount", 0);
+
+        // THÊM: Lấy tableNumber và orderItems từ Intent
+        tableNumber = getIntent().getIntExtra("table_number", 0);
+        if (tableNumber == 0) {
+            Log.w(TAG, "No table number provided!");
+            Snackbar.make(findViewById(android.R.id.content), "Lỗi: Không xác định bàn", Snackbar.LENGTH_SHORT).show();  // THAY Toast bằng Snackbar
+            finish();
+            return;
+        }
+
+        orderItems = (List<OrderItem>) getIntent().getSerializableExtra("items");
+        if (orderItems == null || orderItems.isEmpty()) {
+            Log.w(TAG, "No order items provided!");
+            Snackbar.make(findViewById(android.R.id.content), "Lỗi: Không có món hàng", Snackbar.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
 
         tvTotalAmount = findViewById(R.id.tv_total_amount);
         tvTotalAmount.setText(String.format("%,dđ", totalAmount));
@@ -64,17 +98,30 @@ public class PaymentActivity extends AppCompatActivity {
         Button btnHoanThanh = findViewById(R.id.btn_hoan_thanh);
         btnHoanThanh.setOnClickListener(v -> {
             if (paidAmount < totalAmount) {
-                Toast.makeText(this, "Số tiền phải >= tổng tiền!", Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(android.R.id.content), "Số tiền phải >= tổng tiền!", Snackbar.LENGTH_SHORT).show();  // THAY Toast
                 return;
             }
-            orderDAO.updateOrderStatus(orderId, "Paid");
-            dbHelper.deleteOrderItemsByOrderId(orderId);  // Sử dụng delegate từ helper
-            Log.d("PaymentActivity", "Deleted all OrderItems for order " + orderId);
-            dbHelper.deleteOrderById(orderId);
-            Log.d("PaymentActivity", "Deleted Order " + orderId);
-            Toast.makeText(this, "Hoàn thành thanh toán!", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_OK);
-            finish();
+            // THÊM: Tạo invoice từ order hiện tại
+            int change = paidAmount - totalAmount;
+            Invoice invoice = new Invoice(0, new Date(), tableNumber, totalAmount, orderItems, change);
+
+            // Lưu hóa đơn
+            long invoiceId = dbHelper.addInvoice(invoice);
+            if (invoiceId > 0) {
+                // Giờ delete order cũ (như cũ)
+                orderDAO.updateOrderStatus(orderId, "Paid");
+                dbHelper.deleteOrderItemsByOrderId(orderId);
+                dbHelper.deleteOrderById(orderId);
+
+                // Update bàn về Available
+                dbHelper.updateTableStatus(tableNumber, "Còn trống");  // SỬA: "Còn trống" thay vì "Available" cho nhất quán
+
+                Snackbar.make(findViewById(android.R.id.content), "Hoàn thành thanh toán! Hóa đơn #" + invoiceId, Snackbar.LENGTH_SHORT).show();
+                setResult(RESULT_OK);
+                finish();
+            } else {
+                Snackbar.make(findViewById(android.R.id.content), "Lỗi lưu hóa đơn", Snackbar.LENGTH_SHORT).show();
+            }
         });
 
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
