@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activitis.InvoiceDetailActivity">
+    tools:context=".activities.InvoiceDetailActivity">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
@@ -81,35 +81,79 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_table"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/tv_total" />
+        app:layout_constraintBottom_toTopOf="@+id/bottom_layout" />
 
-    <!-- Tổng tiền -->
-    <TextView
-        android:id="@+id/tv_total"
-        android:layout_width="wrap_content"
+    <!-- FIXED: Wrap tv_total and tv_change in LinearLayout to avoid circular constraints -->
+    <LinearLayout
+        android:id="@+id/bottom_layout"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Tổng: 65.000đ"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="#4CAF50"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintTop_toBottomOf="@+id/rv_invoice_items"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="8dp" />
-
-    <!-- Trả lại -->
-    <TextView
-        android:id="@+id/tv_change"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Trả lại: 5.000đ"
-        android:textSize="16sp"
-        android:textColor="#FF9800"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_total"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp" />
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Tổng tiền -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="8dp"
+                android:text="Tổng tiền: "
+                android:textColor="#4CAF50"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="65.000đ"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#4CAF50"
+                android:layout_marginTop="8dp" />
+
+        </LinearLayout>
+
+        <!-- Trả lại -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:text="Trả lại: "
+                android:textColor="#FF9800"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tv_change"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5.000đ"
+                android:textSize="16sp"
+                android:textColor="#FF9800"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

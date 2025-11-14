@@ -4,15 +4,14 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.neworderfood.activitis.AdminManagementActivity;  // SỬA import
-import com.example.neworderfood.fragment.AdminCategoryFragment;
-import com.example.neworderfood.fragment.AdminDishFragment;
-import com.example.neworderfood.fragment.TableManagementFragment;  // THÊM import
+import com.example.neworderfood.activities.AdminManagementActivity;  // SỬA import
+import com.example.neworderfood.fragments.AdminCategoryFragment;
+import com.example.neworderfood.fragments.AdminDishFragment;
+import com.example.neworderfood.fragments.TableManagementFragment;  // THÊM import
 //import com.example.tt7.fragment.UserManagementFragment;  // THÊM khi có
-import com.example.neworderfood.fragment.UserManagementFragment;
+import com.example.neworderfood.fragments.UserManagementFragment;
 import com.example.neworderfood.models.Category;
 import com.example.neworderfood.models.Dish;
 import com.example.neworderfood.models.Table;

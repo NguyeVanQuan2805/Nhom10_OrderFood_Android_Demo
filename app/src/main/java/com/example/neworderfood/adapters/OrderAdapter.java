@@ -1,5 +1,6 @@
 package com.example.neworderfood.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,13 +43,17 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Order order = orders.get(position);
-        holder.tableText.setText("Bàn " + order.getTableNumber());  // SỬA: Dùng getTableNumber() (đảm bảo model có method này)
-        holder.totalText.setText(String.format("%,dđ", order.getTotalAmount()));  // Format số tiền
-        holder.statusText.setText("Trạng thái: " + order.getStatus());  // Nếu có status view
-        holder.payButton.setOnClickListener(v -> listener.onPayClick(order));  // Thu tiền
+        holder.tableText.setText("Bàn " + order.getTableNumber());
+        holder.totalText.setText(String.format("%,dđ", order.getTotalAmount()));
+        holder.statusText.setText("Trạng thái: " + order.getStatus());
 
-        // THÊM: Button "Thêm món" cho order đang phục vụ
-        if ("Pending".equals(order.getStatus()) || "đang phục vụ".equals(order.getStatus())) {  // Chỉ hiện nếu chưa paid
+        // FIXED: Always show pay button for unpaid orders
+        holder.payButton.setOnClickListener(v -> listener.onPayClick(order)); // Thu tiền - luôn visible
+        holder.payButton.setVisibility(View.VISIBLE);  // FIXED: Force visible
+
+        // FIXED: Check status exact match (trim & lowercase for safety)
+        String statusLower = order.getStatus().trim().toLowerCase();
+        if (statusLower.equals("pending") || statusLower.equals("đang phục vụ")) {
             holder.addDishButton.setVisibility(View.VISIBLE);
             holder.addDishButton.setOnClickListener(v -> listener.onAddDishClick(order));
         } else {

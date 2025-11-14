@@ -1,6 +1,7 @@
 package com.example.neworderfood.adapters;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,27 +68,28 @@ public class AdminDishAdapter extends RecyclerView.Adapter<AdminDishAdapter.View
      * Phương thức load ảnh cho món ăn trong admin
      */
     private void loadDishImage(ImageView imageView, Dish dish) {
-        // Ưu tiên ảnh custom Base64
+        // Ưu tiên custom Base64
         if (dish.hasCustomImage()) {
             Bitmap customBitmap = ImageUtils.base64ToBitmap(dish.getImageBase64());
             if (customBitmap != null) {
                 imageView.setImageBitmap(customBitmap);
+                Log.d("DishAdapter", "Loaded custom image for " + dish.getName());
                 return;
+            } else {
+                Log.w("DishAdapter", "Invalid Base64 for " + dish.getName() + " - fallback to resource");
             }
         }
 
-        // Fallback đến ảnh resource
-        if (dish.getImageResource() != 0) {
-            try {
-                imageView.setImageResource(dish.getImageResource());
-                return;
-            } catch (Exception e) {
-                // Resource không tồn tại
-            }
+        // Fallback resource (nếu >0)
+        if (dish.getImageResource() > 0) {
+            imageView.setImageResource(dish.getImageResource());
+            Log.d("DishAdapter", "Loaded resource image for " + dish.getName());
+            return;
         }
 
-        // Ảnh mặc định
+        // Default
         imageView.setImageResource(R.drawable.bun_ca);
+        Log.d("DishAdapter", "Used default image for " + dish.getName());
     }
 
     /**

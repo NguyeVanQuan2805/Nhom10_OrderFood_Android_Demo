@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activitis.DishDetailActivity">
+    tools:context=".activities.DishDetailActivity">
 
     <!-- THÊM: Toolbar với nút quay về (mũi tên back) -->
     <androidx.appcompat.widget.Toolbar

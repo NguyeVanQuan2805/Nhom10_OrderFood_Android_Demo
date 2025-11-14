@@ -1,6 +1,11 @@
 package com.example.neworderfood.models;
 
+import com.example.neworderfood.room.entities.DishEntity;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Dish implements Serializable {
     private int id;
@@ -47,5 +52,18 @@ public class Dish implements Serializable {
     // Phương thức tiện ích để lấy ảnh hiển thị
     public boolean hasCustomImage() {
         return imageBase64 != null && !imageBase64.isEmpty();
+    }
+
+    public static Dish fromEntity(DishEntity entity) {
+        if (entity == null) return null;
+        return new Dish(entity.id, entity.name, entity.price, entity.categoryId, entity.imageResource, entity.imageBase64);
+    }
+
+    public static List<Dish> fromEntities(List<DishEntity> entities) {
+        if (entities == null) return new ArrayList<>();
+        return entities.stream().map(e -> new Dish(e.id, e.name, e.price, e.categoryId, e.imageResource, e.imageBase64)).collect(Collectors.toList());
+    }
+    public DishEntity toEntity() {
+        return new DishEntity(id, name, price, categoryId, imageResource, imageBase64);
     }
 }

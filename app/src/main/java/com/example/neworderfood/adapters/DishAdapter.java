@@ -1,6 +1,7 @@
 package com.example.neworderfood.adapters;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,35 +51,42 @@ public class DishAdapter extends RecyclerView.Adapter<DishAdapter.ViewHolder> im
         // HIỂN THỊ ẢNH - ƯU TIÊN ẢNH CUSTOM
         loadDishImage(holder.image, dish);
 
-        holder.itemView.setOnClickListener(v -> listener.onDishClick(dish));
+        holder.itemView.setOnClickListener(v -> {
+            Log.d("DishAdapter", "Item clicked: " + dish.getName());  // ADD LOG TO DEBUG
+            if (listener != null) {
+                listener.onDishClick(dish);
+            }
+        });
+
+        // OPTIONAL: Make subviews non-focusable to avoid blocking
+        holder.nameText.setFocusable(false);
+        holder.priceText.setFocusable(false);
+        holder.image.setFocusable(false);
     }
 
-    /**
-     * Phương thức load ảnh cho món ăn
-     * Ưu tiên: Ảnh custom Base64 -> Ảnh resource -> Ảnh mặc định
-     */
     private void loadDishImage(ImageView imageView, Dish dish) {
-        // Kiểm tra và hiển thị ảnh custom (Base64)
+        // Ưu tiên custom Base64
         if (dish.hasCustomImage()) {
             Bitmap customBitmap = ImageUtils.base64ToBitmap(dish.getImageBase64());
             if (customBitmap != null) {
                 imageView.setImageBitmap(customBitmap);
-                return; // Thoát nếu đã load được ảnh custom
+                Log.d("DishAdapter", "Loaded custom image for " + dish.getName());
+                return;
+            } else {
+                Log.w("DishAdapter", "Invalid Base64 for " + dish.getName() + " - fallback to resource");
             }
         }
 
-        // Kiểm tra và hiển thị ảnh resource
-        if (dish.getImageResource() != 0) {
-            try {
-                imageView.setImageResource(dish.getImageResource());
-                return; // Thoát nếu đã load được ảnh resource
-            } catch (Exception e) {
-                // Fallback nếu resource không tồn tại
-            }
+        // Fallback resource (nếu >0)
+        if (dish.getImageResource() > 0) {
+            imageView.setImageResource(dish.getImageResource());
+            Log.d("DishAdapter", "Loaded resource image for " + dish.getName());
+            return;
         }
 
-        // Sử dụng ảnh mặc định
+        // Default
         imageView.setImageResource(R.drawable.bun_ca);
+        Log.d("DishAdapter", "Used default image for " + dish.getName());
     }
 
     @Override

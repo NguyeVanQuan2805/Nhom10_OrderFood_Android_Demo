@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- Cho Android 10+ -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <application
         android:allowBackup="true"
@@ -14,31 +15,31 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NewOrderFood">
         <activity
-            android:name=".activitis.TableStatusActivity"
+            android:name=".activities.TableStatusActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.InvoiceListActivity"
+            android:name=".activities.InvoiceListActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.InvoiceDetailActivity"
+            android:name=".activities.InvoiceDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.AdminManagementActivity"
+            android:name=".activities.AdminManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.PaymentActivity"
+            android:name=".activities.PaymentActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.OrderSummaryActivity"
+            android:name=".activities.OrderSummaryActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.DishDetailActivity"
+            android:name=".activities.DishDetailActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.MenuActivity"
+            android:name=".activities.MenuActivity"
             android:exported="false" />
         <activity
-            android:name=".activitis.LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
