@@ -1,5 +1,5 @@
 OrderFood Restaurant Management App
-App Icon 
+
 Giới thiệu
 OrderFood là ứng dụng quản lý nhà hàng đơn giản, được xây dựng bằng Android Studio. Ứng dụng hỗ trợ quản lý danh mục món ăn, bàn ăn, user, order, hóa đơn và thanh toán. Phù hợp cho nhà hàng nhỏ, với giao diện thân thiện và tích hợp cơ sở dữ liệu Room SQLite.
 Dự án được phát triển như một ứng dụng demo, tập trung vào các tính năng cốt lõi như đặt món, quản lý admin, và xử lý thanh toán. Ứng dụng hỗ trợ cả admin (quản lý) và employee (nhân viên phục vụ).
