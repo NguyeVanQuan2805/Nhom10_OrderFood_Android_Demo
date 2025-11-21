@@ -370,6 +370,10 @@ public class AdminManagementActivity extends AppCompatActivity {
             saveDishData(etName, etPrice, spinnerCategory, dish);
         });
         builder.setNegativeButton("Hủy", null);
+        // UPDATED: Add neutral button for delete if editing
+        if (dish != null) {
+            builder.setNeutralButton("Xóa", (dialog, which) -> confirmDeleteDish(dish));
+        }
         builder.show();
     }
 
@@ -694,7 +698,7 @@ public class AdminManagementActivity extends AppCompatActivity {
     private void confirmDeleteDish(Dish dish) {
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xóa")
-                .setMessage("Xóa món ăn này?")
+                .setMessage("Xóa món ăn '" + dish.getName() + "'?")
                 .setPositiveButton("Xóa", (dialog, which) -> {
                     if (dishDAO.deleteDish(dish.getId()) > 0) {
                         loadDataAsync();  // FIXED: Reload async
@@ -825,7 +829,17 @@ public class AdminManagementActivity extends AppCompatActivity {
         Log.d(TAG, "Dialog shown for table " + table.getNumber());
     }
 
+    // UPDATED: Prevent deletion if status is "đang phục vụ"
     private void confirmDeleteTable(Table table) {
+        if ("đang phục vụ".equals(table.getStatus())) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Không thể xóa")
+                    .setMessage("Không thể xóa bàn có trạng thái 'đang phục vụ'!")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xóa")
                 .setMessage("Xóa bàn " + table.getNumber() + " sẽ ảnh hưởng đến orders liên quan. Tiếp tục?")
@@ -957,7 +971,17 @@ public class AdminManagementActivity extends AppCompatActivity {
         builder.show();
     }
 
+    // UPDATED: Prevent deletion if role is "admin"
     private void confirmDeleteUser(User user) {
+        if ("admin".equals(user.getRole())) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Không thể xóa")
+                    .setMessage("Không thể xóa tài khoản admin!")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xóa")
                 .setMessage("Xóa user '" + user.getUsername() + "' sẽ ảnh hưởng đến login. Tiếp tục? (Không thể khôi phục)")
