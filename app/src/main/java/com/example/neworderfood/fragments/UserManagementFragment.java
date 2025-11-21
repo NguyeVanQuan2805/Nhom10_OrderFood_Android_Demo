@@ -146,6 +146,16 @@ public class UserManagementFragment extends Fragment {
 
     // THÊM: Method delete user
     private void showDeleteUserDialog(User user) {
+        // UPDATED: Check if admin role - cannot delete
+        if ("admin".equals(user.getRole())) {
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Không thể xóa")
+                    .setMessage("Không thể xóa tài khoản admin!")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
         new AlertDialog.Builder(getContext())
                 .setTitle("Xác nhận xóa")
                 .setMessage("Xóa user '" + user.getUsername() + "'? (Không thể khôi phục)")
